@@ -2,19 +2,21 @@ package controller
 
 import (
 	"fmt"
-	
-	"github.com/lricardogarcia/primeiro-crud-go/src/configuration/rest_err"	
-	"github.com/lricardogarcia/primeiro-crud-go/src/controller/model/request"
+	"log"
+
 	"github.com/gin-gonic/gin"
+	"github.com/lricardogarcia/primeiro-crud-go/src/configuration/validation"
+	"github.com/lricardogarcia/primeiro-crud-go/src/controller/model/request"
 )
 
 func CreateUser(c *gin.Context) {
+	log.Println("Init CreateUser controller")
 	var userRequest request.UserRequest
 
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
-		restErr := rest_err.NewBadRequestError(
-			fmt.Sprintf("There are some incorrect fields, error=%s\n", err.Error()))
-		c.JSON(restErr.Code, restErr)
+		log.Printf("Error trying to marshal object, error=%s\n", err.Error())
+		errRest := validation.ValidateUserError(err)
+		c.JSON(errRest.Code, errRest)
 		return
 	}
 
